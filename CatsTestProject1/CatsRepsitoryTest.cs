@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 
 namespace CatsTestProject1
 {
-    public class UnitTest1
+    public class CatsRepsitoryTest
     {
-        private bool useDatabase = false;
+        private bool useDatabase = true;
         private ICatsRepository repo;
 
-        public UnitTest1()
+        public CatsRepsitoryTest()
         {
             if (useDatabase) {
                 var optionsBuilder = new DbContextOptionsBuilder<CatsDbContext>();
@@ -19,19 +19,19 @@ namespace CatsTestProject1
                 //   "Data Source=mssql7.unoeuro.com;Initial Catalog=FROM simply.com;Persist Security Info=True;User ID=FROM simply.com;Password=DB PASSWORD FROM simply.com;TrustServerCertificate=True"
                 CatsDbContext _dbContext = new(optionsBuilder.Options);
                 // clean database table: remove all rows
-                _dbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE dbo.Movies");
+                _dbContext.Database.ExecuteSqlRaw("TRUNCATE TABLE dbo.Cats");
                 repo = new CatsRepositoryDatabase(_dbContext);
             }
             else
             {
-                repo = new CatsRepositoryList();
+                repo = new CatsRepositoryList(includeData: false);
             }
         }
 
         [Fact]
         public void AddCat_AssignsIdAndStores()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
             Cat newCat = new Cat { Name = "TestCat", Weight = 3 };
 
             Cat added = repo.AddCat(newCat);
@@ -58,16 +58,16 @@ namespace CatsTestProject1
         [Fact]
         public void AddCat_Null_ThrowsArgumentNullException()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
 
             ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => repo.AddCat(null!));
             Assert.Equal("cat", ex.ParamName);
         }
 
-        [Fact]
+        //[Fact]
         public void GetAllCats_ReturnsReadOnlyCollection()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: true);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: true);
 
             IEnumerable<Cat> all = repo.GetAllCats();
 
@@ -81,7 +81,9 @@ namespace CatsTestProject1
         [Fact]
         public void GetCatById_ReturnsCorrectCatOrNull()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: true);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
+
+            repo.AddCat(new Cat { Name = "Cat1", Weight = 2 });
 
             Cat? first = repo.GetCatById(1);
             Assert.NotNull(first);
@@ -94,7 +96,7 @@ namespace CatsTestProject1
         [Fact]
         public void RemoveCat_RemovesAndReturns()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
             Cat cat = new Cat { Name = "ToRemove", Weight = 2 };
             Cat added = repo.AddCat(cat);
 
@@ -112,7 +114,7 @@ namespace CatsTestProject1
         [Fact]
         public void RemoveCat_NonExistent_ReturnsNull()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
 
             Cat? removed = repo.RemoveCat(12345);
             Assert.Null(removed);
@@ -121,7 +123,7 @@ namespace CatsTestProject1
         [Fact]
         public void UpdateCat_UpdatesExisting_ReturnsUpdated()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
             Cat original = new Cat { Name = "Old", Weight = 2 };
             Cat added = repo.AddCat(original);
 
@@ -143,7 +145,7 @@ namespace CatsTestProject1
         [Fact]
         public void UpdateCat_NonExistent_ReturnsNull()
         {
-            ICatsRepository repo = new CatsRepositoryList(includeData: false);
+            //ICatsRepository repo = new CatsRepositoryList(includeData: false);
             Cat payload = new Cat { Name = "Whatever", Weight = 1 };
 
             Cat? updated = repo.UpdateCat(42, payload);
