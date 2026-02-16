@@ -6,7 +6,7 @@ namespace CatsTestProject1
 {
     public class CatsRepsitoryTest
     {
-        private bool useDatabase = true;
+        private bool useDatabase = false;
         private ICatsRepository repo;
 
         public CatsRepsitoryTest()
@@ -64,7 +64,7 @@ namespace CatsTestProject1
             Assert.Equal("cat", ex.ParamName);
         }
 
-        //[Fact]
+        [Fact]
         public void GetAllCats_ReturnsReadOnlyCollection()
         {
             //ICatsRepository repo = new CatsRepositoryList(includeData: true);
