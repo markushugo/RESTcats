@@ -9,7 +9,6 @@ namespace RESTcats.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CatsController : ControllerBase
     {
         private CatsRepositoryList _repo;
@@ -23,7 +22,7 @@ namespace RESTcats.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
+        [Authorize]
         [HttpGet]
         public ActionResult< IEnumerable<Cat>> Get([FromQuery] int? minimumweight, [FromQuery] int? maximumweight)
         {
@@ -42,6 +41,7 @@ namespace RESTcats.Controllers
         // GET api/<CatsController>/5
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<Cat> Get(int id)
         {
@@ -56,6 +56,7 @@ namespace RESTcats.Controllers
         // POST api/<CatsController>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<Cat> Post([FromBody] Cat newCat)
         {
@@ -74,6 +75,7 @@ namespace RESTcats.Controllers
         // PUT api/<CatsController>/5
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public ActionResult<Cat> Put(int id, [FromBody] Cat value)
         {
@@ -86,9 +88,10 @@ namespace RESTcats.Controllers
         }
 
         // DELETE api/<CatsController>/5
-        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
         public ActionResult<Cat> Delete(int id)
         {
             Cat? cat = _repo.RemoveCat(id);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,18 +21,29 @@ namespace JwtTest.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest login)
         {
-            // 1. Validate the user (In a real scenario, check your database here)
-            // Here we use a simple hardcoded check:
+            // 1. Validate the user and assign a role
+            string role = "";
+
             if (login.Username == "admin" && login.Password == "1234")
             {
-                var token = GenerateJwtToken(login.Username);
-                return Ok(new { token });
+                role = "Admin";
+            }
+            else if (login.Username == "user" && login.Password == "1234")
+            {
+                role = "User";
+            }
+            else
+            {
+                return Unauthorized("Invalid username or password.");
             }
 
-            return Unauthorized("Invalid username or password.");
+            // Pass the role to the generator
+            var token = GenerateJwtToken(login.Username, role);
+            return Ok(new { token });
         }
 
-        private string GenerateJwtToken(string username)
+
+        private string GenerateJwtToken(string username, string role) // Added role parameter
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
@@ -43,19 +55,20 @@ namespace JwtTest.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, "Admin") // You can add roles here
+                new Claim(ClaimTypes.Role, role) // The token now bakes the dynamic role into the passport!
             };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(2), // Token is valid for 2 hours
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 
     // Helper class to receive JSON data
