@@ -19,7 +19,7 @@
             return cat;
         }
 
-        public IEnumerable<Cat> GetAllCats()
+        public IEnumerable<Cat> GetAllCats(int? minimumweight, int? maximumweight)
         {
             return _context.Cats;
         }

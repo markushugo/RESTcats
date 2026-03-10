@@ -15,10 +15,18 @@
             }
         }
 
-        public IEnumerable<Cat> GetAllCats()
+        public IEnumerable<Cat> GetAllCats(int? minimumweight, int? maximumweight)
         {
-            return cats.AsReadOnly();
-        }
+            IEnumerable<Cat> result = cats.AsReadOnly();
+            if (minimumweight != null)
+            {
+                result = result.Where(c => c.Weight >= minimumweight.Value);
+            }
+            if (maximumweight != null)
+            {
+                result = result.Where(c => c.Weight <= maximumweight.Value);
+            } return result;
+            }
         public Cat? GetCatById(int id)
         {
             return cats.FirstOrDefault(c => c.Id == id);
